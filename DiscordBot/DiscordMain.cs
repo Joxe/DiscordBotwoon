@@ -104,22 +104,37 @@ namespace DiscordBot {
 				return;
 			}
 
-			string[] splitMessage = a_quoteMessage.Split(';');
-			string command = splitMessage.Length > 0 ? splitMessage[0].ToLower() : null;
-			string author  = splitMessage.Length > 1 ? splitMessage[1] : null;
-			string message = splitMessage.Length > 2 ? splitMessage[2] : null;
+			string command = a_quoteMessage.Split(' ')[0].Trim();
 
 			if (command == "get") {
-				client.SendMessageToChannel(ds.getRandomQuote(author), a_channel);
+				if (a_quoteMessage.Length > 3) {
+					client.SendMessageToChannel(ds.getRandomQuote(a_quoteMessage.Substring(4).Split(' ')[0]), a_channel);
+				} else {
+					client.SendMessageToChannel(ds.getRandomQuote(""), a_channel);
+				}
+
 				return;
 			} else if (command == "add") {
-				client.SendMessageToChannel(ds.addQuote(author, message), a_channel);
+				if (a_quoteMessage.Length > 3) {
+					client.SendMessageToChannel(ds.addQuote(a_quoteMessage.Substring(4)), a_channel);
+				} else {
+					client.SendMessageToChannel(ds.addQuote(""), a_channel);
+				}
+
 				return;
 			} else if (command == "remove") {
-				client.SendMessageToChannel(ds.removeQuotesForUser(author), a_channel);
+				if (a_quoteMessage.Length > 6) {
+					client.SendMessageToChannel(ds.removeQuotesForUser(a_quoteMessage.Substring(7).Split(' ')[0]), a_channel);
+				} else {
+					client.SendMessageToChannel(ds.removeQuotesForUser(""), a_channel);
+				}
+
 				return;
 			} else if (command == "clear") {
 				client.SendMessageToChannel(ds.clearQuotes(a_sender), a_channel);
+				return;
+			} else if (command == "count") {
+				client.SendMessageToChannel(ds.getQuoteCount(), a_channel);
 				return;
 			}
 			client.SendMessageToChannel(QUOTE_USAGE, a_channel);
