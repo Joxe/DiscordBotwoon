@@ -63,15 +63,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="D2Runeword.cs" />
-    <Compile Include="D2Plugin.cs" />
+    <Compile Include="Plugins\CommandsPlugin.cs" />
+    <Compile Include="Plugins\D2Plugin\D2Runeword.cs" />
+    <Compile Include="Plugins\D2Plugin\D2Plugin.cs" />
     <Compile Include="DiscordMain.cs" />
     <Compile Include="DiscordServerData.cs" />
+    <Compile Include="DiscordPlugin.cs" />
+    <Compile Include="Plugins\DamageBoostPlugin.cs" />
+    <Compile Include="Plugins\HarpunenPlugin.cs" />
+    <Compile Include="Plugins\PenisPlugin.cs" />
+    <Compile Include="Plugins\QuotePlugin.cs" />
+    <Compile Include="Plugins\VersionPlugin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quote.cs" />
     <Compile Include="RemindEvent.cs" />
-    <Compile Include="TimeFunctions.cs" />
+    <Compile Include="Plugins\TimePlugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

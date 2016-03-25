@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace DiscordBotDiablo2 {
+namespace DiscordBot.Plugins.D2Plugin {
 	class Runeword {
 		#region Constants
 		public const string 
