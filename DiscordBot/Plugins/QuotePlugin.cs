@@ -7,7 +7,7 @@ using DiscordSharp.Events;
 
 namespace DiscordBot.Plugins {
 	class QuotePlugin : DiscordPlugin {
-		private const string QUOTE_USAGE = "Quote Command Usage\n!quote add <author>;<message>\n!quote get\n!quote get <author>\n!quote remove <author>\n!quote clear";
+		private const string QUOTE_USAGE = "Quote Command Usage\n!quote add <author>;<message>\n!quote get <author>\n!quote remove <author>\n!quote clear";
 		private List<DiscordServerData> m_discordServers = new List<DiscordServerData>();
 
 		public QuotePlugin(DiscordMain a_discordMain) : base(a_discordMain) {
@@ -26,16 +26,16 @@ namespace DiscordBot.Plugins {
 				splitString[i] = splitString[i].Trim();
 			}
 
-			if (a_eventArgs.message_text.Length == Command.Length) {
-				a_eventArgs.Channel.SendMessage(QUOTE_USAGE);
-				return;
-			}
-
 			DiscordServerData ds = m_discordServers.Find(x => x.Server == a_eventArgs.Channel.parent);
 
 			if (ds == null) {
 				ds = new DiscordServerData(a_eventArgs.Channel.parent);
 				m_discordServers.Add(ds);
+			}
+
+			if (a_eventArgs.message_text.Length == Command.Length) {
+				a_eventArgs.Channel.SendMessage(ds.getRandomQuote(""));
+				return;
 			}
 
 			string subCommand = splitString[1];
@@ -55,8 +55,11 @@ namespace DiscordBot.Plugins {
 			} else if (subCommand == "count") {
 				a_eventArgs.Channel.SendMessage(ds.getQuoteCount());
 				return;
+			} else if (subCommand == "help") {
+				a_eventArgs.Channel.SendMessage(QUOTE_USAGE);
+				return;
 			}
-			a_eventArgs.Channel.SendMessage(QUOTE_USAGE);
+			a_eventArgs.Channel.SendMessage(ds.getRandomQuote(a_eventArgs.message_text.Substring(Command.Length + subCommand.Length + 1).Trim()));
 		}
 	}
 }
