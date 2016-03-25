@@ -9,8 +9,13 @@ namespace DiscordBot {
 		private const string TIME_JAP = "Time in Japan is: {0}:{1}";
 		private const string TIME_USW = "Time on the US West Coast is: {0}:{1}";
 
+		//TODO concider daylight savings
+		private const int AUS_TIME_DIFF = 10;
+		private const int JAP_TIME_DIFF = 8;
+		private const int USW_TIME_DIFF = -8;
+
 		private readonly static string[] AUS_MATCHES = {
-			"aus", "anton", "kangarooland", "poison"
+			"aus", "anton", "kangarooland", "poison", "down under"
 		};
 
 		private readonly static string[] JAP_MATCHES = {
@@ -22,23 +27,29 @@ namespace DiscordBot {
 		};
 
 		public static string getTimeForLocation(string a_location) {
-			if (a_location == null || a_location.Length == 0) {
+			if (string.IsNullOrWhiteSpace(a_location)) {
 				return string.Format(TIME_MY_TIME, DateTime.Now.ToString()) + "\n" + TIME_USAGE;
 			}
-			if (AUS_MATCHES.First(x => x == a_location.ToLower()) != null) {
-				DateTime dt = DateTime.Now.AddHours(10.0);
-				return string.Format(TIME_AUS, dt.Hour.ToString().PadLeft(2, '0'), dt.Minute.ToString().PadLeft(2, '0'));
+			a_location = a_location.ToLower();
+			if (AUS_MATCHES.Contains(a_location)) {
+				return formatTimeDiff(TIME_AUS, AUS_TIME_DIFF);
 			}
-			if (JAP_MATCHES.First(x => x == a_location.ToLower()) != null) {
-				DateTime dt = DateTime.Now.AddHours(8.0);
-				return string.Format(TIME_JAP, dt.Hour.ToString().PadLeft(2, '0'), dt.Minute.ToString().PadLeft(2, '0'));
+			if (JAP_MATCHES.Contains(a_location)) {
+				return formatTimeDiff(TIME_JAP, JAP_TIME_DIFF);
 			}
-			if (USW_MATCHES.First(x => x == a_location.ToLower()) != null) {
-				DateTime dt = DateTime.Now.AddHours(-8.0);
-				return string.Format(TIME_USW, dt.Hour.ToString().PadLeft(2, '0'), dt.Minute.ToString().PadLeft(2, '0'));
+			if (USW_MATCHES.Contains(a_location)) {
+				return formatTimeDiff(TIME_USW, USW_TIME_DIFF);
 			}
 
 			return TIME_USAGE;
+		}
+
+		public static string formatTimeDiff(string str, int timeDiff) {
+			return formatTime(str, DateTime.Now.AddHours(timeDiff));
+		}
+
+		public static string formatTime(string str, DateTime time) {
+			return string.Format(str, time.Hour.ToString().PadLeft(2, '0'), time.Minute.ToString().PadLeft(2, '0'));
 		}
 	}
 }
