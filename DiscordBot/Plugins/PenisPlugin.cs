@@ -11,7 +11,7 @@ namespace DiscordBot.Plugins {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage("https://www.youtube.com/watch?v=93Tj2bCslBk");
+			a_eventArgs.Channel.SendMessage("https://www.youtube.com/watch?v=1qe2MDdfw1g");
 		}
 
 		public override string ToString() {
