@@ -16,6 +16,13 @@ namespace DiscordBot {
 		private Thread m_eventThread;
 		private bool m_hasStartedConnecting = false;
 
+		//Is this ok? I really need it in my plugin, man
+		public DiscordClient Client {
+			get {
+				return m_client;
+			}
+		}
+
 		public DiscordMain() {
 			if (!File.Exists("credentials.txt")) {
 				throw new FileNotFoundException("No 'credentials.txt' found, make sure that it's placed in the same directory as the executable!");
