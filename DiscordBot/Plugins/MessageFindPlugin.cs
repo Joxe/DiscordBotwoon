@@ -22,15 +22,13 @@ namespace DiscordBot.Plugins {
 				return;
 			}
 			DiscordChannel channel = a_eventArgs.Channel;
-			string stringToFind = a_eventArgs.message_text.Substring(Command.Length).Trim;
+			string stringToFind = a_eventArgs.message_text.Substring(Command.Length).Trim();
 			if (string.IsNullOrEmpty(stringToFind)) {
 				channel.SendMessage(USAGE);
 			} else {
-				if(stringToFind.StartsWith('"') && stringToFind.EndsWith('"')) {
-					stringToFind = stringToFind.Substring(1, stringToFind.Length - 2);
-				}
+				stringToFind = removeEncapsulation(stringToFind, "\"").ToLower();
 				var iterator = MessageHistoryIterator.flatten(PAGE_SIZE, MAX_PAGES, m_discordMain.Client, channel);
-				var foundMessage = iterator.FirstOrDefault(x => x.content.Contains(stringToFind));
+				var foundMessage = iterator.FirstOrDefault(x => MessageMatchesSearch(x, stringToFind));
 				channel.SendMessage(foundMessage == null
 					? ResponseNoMessageFound(stringToFind)
 					: ResponseMessageFound(foundMessage)
@@ -48,6 +46,16 @@ namespace DiscordBot.Plugins {
 
 		private static string ResponseMessageFound(DiscordMessage message) {
 			return string.Format(RESPONSE_MESSAGE_FOUND, message.timestamp.ToString(), message.author.Username, message.content);
+		}
+
+		private static string removeEncapsulation(string str, string encapsulation) {
+			return str.StartsWith(encapsulation) && str.EndsWith(encapsulation)
+				? str.Substring(encapsulation.Length, str.Length - (encapsulation.Length * 2))
+				: str;
+		}
+
+		private static bool MessageMatchesSearch(DiscordMessage message, string searchString) {
+			return message.content.ToLower().Contains(searchString);
 		}
 	}
 }
