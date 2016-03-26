@@ -47,16 +47,17 @@ namespace DiscordBot {
 
 			m_client.SendLoginRequest();
 
-			Plugins = new List<DiscordPlugin>();
-
-			Plugins.Add(new TimePlugin(this));
-			Plugins.Add(new Diablo2Plugin(this));
-			Plugins.Add(new HarpunenPlugin(this));
-			Plugins.Add(new PenisPlugin(this));
-			Plugins.Add(new DamageBoostPlugin(this));
-			Plugins.Add(new CommandsPlugin(this));
-			Plugins.Add(new VersionPlugin(this));
-			Plugins.Add(new QuotePlugin(this));
+			Plugins = new List<DiscordPlugin> {
+				new TimePlugin(this),
+				new Diablo2Plugin(this),
+				new HarpunenPlugin(this),
+				new PenisPlugin(this),
+				new DamageBoostPlugin(this),
+				new CommandsPlugin(this),
+				new VersionPlugin(this),
+				new QuotePlugin(this),
+				new MessageFindPlugin(this)
+			};
 
 			for (int i = 0; i < Plugins.Count; ) {
 				if (string.IsNullOrEmpty(Plugins[i].Command)) {
