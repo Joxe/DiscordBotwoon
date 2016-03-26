@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading;
 using DiscordSharp;
@@ -9,7 +10,7 @@ using DiscordSharp.Objects;
 namespace DiscordBot {
 	class DiscordMain {
 		private const string VERSION = "Hello I'm Botwoon in a very early version (24th of March 2016), please no Super Missiles.";
-		private const string COMMANDS = "Available Commands\n!time\n!harpunen\n!penis\n!dboost\n!quote\n!d2r";
+		private const string COMMANDS = "Available Commands\n!time\n!quote\n!d2r\n!commands";
 		private const string QUOTE_USAGE = "Quote Command Usage\n!quote add <author>;<message>\n!quote get\n!quote get <author>\n!quote remove <author>\n!quote clear";
 		private const string D2_USAGE = "Diablo 2 Command Usage\n!d2r <runeword name>\n!d2r find <itemtype> <sockets>\n!d2r find <runes>";
 		private const string EMSG_D2_CANT_FIND_SOCKETS = "I can't understand how many sockets the item you specified has!";
@@ -17,6 +18,14 @@ namespace DiscordBot {
 
 		private DiscordClient client = new DiscordClient();
 		private List<DiscordServerData> m_discordServers = new List<DiscordServerData>();
+
+		private Dictionary<string, Command> commandObjs = new Dictionary<string, Command> {
+			{"harpunen", new ConstantReply("https://www.youtube.com/watch?v=93Tj2bCslBk")},
+			{"penis", new ConstantReply("https://www.youtube.com/watch?v=1qe2MDdfw1g")},
+			{"dboost", new ConstantReply("http://i.imgur.com/cSAlF1d.jpg")},
+			{"version", new ConstantReply(VERSION)},
+			{"find", new MessageSearch()}
+		};
 
 		public DiscordMain() {
 			if (!File.Exists("credentials.txt")) {
@@ -49,42 +58,51 @@ namespace DiscordBot {
 		}
 
 		private void parseMessage(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			string[] message = a_eventArgs.message.content.Split(' ');
+			string[] splitCommandMessage = a_eventArgs.message.content.Split(new char[]{' '}, 2);
 			DiscordChannel channel = a_eventArgs.Channel;
 
-			if (message.Length == 0) {
+			if (splitCommandMessage.Length == 0) {
 				return;
 			}
-			if (!message[0].StartsWith("!")) {
+			if (!splitCommandMessage[0].StartsWith("!")) {
 				return;
 			}
 
-			string command = message[0].Substring(1);
+			string command = splitCommandMessage[0].Substring(1);
+			string parameters = splitCommandMessage.Length >= 2
+				? splitCommandMessage[1]
+				: null;
 
-			if (command == "time") {
-				handleTimeCommand(message.Length == 1 ? null : message[1], channel);
-			} else if (command == "harpunen") {
-				client.SendMessageToChannel("https://www.youtube.com/watch?v=93Tj2bCslBk", channel);
-			} else if (command == "penis") {
-				client.SendMessageToChannel("https://www.youtube.com/watch?v=1qe2MDdfw1g", channel);
-			} else if (command == "dboost") {
-				client.SendMessageToChannel("http://i.imgur.com/cSAlF1d.jpg", channel);
-			} else if (command == "quote") {
-				if (a_eventArgs.message.content.Length >= 7) {
-					handleQuote(a_eventArgs.message.content.Substring(7), a_eventArgs.author, channel);
-				} else {
-					handleQuote("", a_eventArgs.author, channel);
-				}
-			} else if (command == "d2r") {
-				if (a_eventArgs.message.content.Length >= 5) {
-					handleDiablo2(a_eventArgs.message.content.Substring(5), channel);
-				} else {
-					handleDiablo2("", channel);
-				}
-			} else if (command == "version") {
-				client.SendMessageToChannel(VERSION, channel);
-			} else if (command == "commands") {
-				client.SendMessageToChannel(COMMANDS, channel);
+			switch(command){
+				case "time":
+					handleTimeCommand(parameters, channel);
+					break;
+				case "quote":
+					if (a_eventArgs.message.content.Length >= 7) {
+						handleQuote(a_eventArgs.message.content.Substring(7), a_eventArgs.author, channel);
+					} else {
+						handleQuote("", a_eventArgs.author, channel);
+					}
+					break;
+				case "d2r":
+					if(a_eventArgs.message.content.Length >= 5) {
+						handleDiablo2(a_eventArgs.message.content.Substring(5), channel);
+					} else {
+						handleDiablo2("", channel);
+					}
+					break;
+				case "commands":
+					string commandStrings = commandObjs.Keys.Aggregate(COMMANDS, (x, y) => x + "\n!" + y);
+					client.SendMessageToChannel(commandStrings, channel);
+					break;
+				default:
+					Command foundCommand;
+					if(commandObjs.TryGetValue(command, out foundCommand)) {
+						foundCommand.execute(client, channel, a_eventArgs.author, parameters);
+					} else {
+						client.SendMessageToChannel(splitCommandMessage[0] + " is not a valid command. " + COMMANDS, channel);
+					}
+					break;
 			}
 		}
 
