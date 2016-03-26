@@ -118,7 +118,7 @@ namespace DiscordBot {
 		}
 
 		public DiscordPlugin getPluginFromCommand(string a_command) {
-			return Plugins.SingleOrDefault(string.Compare(x.Command, a_command, true) == 0);
+			return Plugins.SingleOrDefault(x => string.Compare(x.Command, a_command, true) == 0);
 		}
 	}
 }
