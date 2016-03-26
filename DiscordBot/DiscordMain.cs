@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading;
 using DiscordSharp;
@@ -117,13 +118,7 @@ namespace DiscordBot {
 		}
 
 		public DiscordPlugin getPluginFromCommand(string a_command) {
-			foreach (var plugin in Plugins) {
-				if (plugin.Command == a_command) {
-					return plugin;
-				}
-			}
-
-			return null;
+			return Plugins.SingleOrDefault(string.Compare(x.Command, a_command, true) == 0);
 		}
 	}
 }
