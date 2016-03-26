@@ -1,197 +1,121 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Threading;
 using DiscordSharp;
-using DiscordSharp.Events;
-using DiscordSharp.Objects;
+using DiscordBot.Plugins;
+using DiscordBot.Plugins.D2Plugin;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DiscordBot {
 	class DiscordMain {
-		private const string VERSION = "Hello I'm Botwoon in a very early version (24th of March 2016), please no Super Missiles.";
-		private const string COMMANDS = "Available Commands\n!time\n!quote\n!d2r\n!commands";
-		private const string QUOTE_USAGE = "Quote Command Usage\n!quote add <author>;<message>\n!quote get\n!quote get <author>\n!quote remove <author>\n!quote clear";
-		private const string D2_USAGE = "Diablo 2 Command Usage\n!d2r <runeword name>\n!d2r find <itemtype> <sockets>\n!d2r find <runes>";
-		private const string EMSG_D2_CANT_FIND_SOCKETS = "I can't understand how many sockets the item you specified has!";
-		private const string EMSG_D2_NO_ITEM = "You have no specified an item to look for!";
+		public List<DiscordPlugin> Plugins { get; private set; }
 
-		private DiscordClient client = new DiscordClient();
-		private List<DiscordServerData> m_discordServers = new List<DiscordServerData>();
-
-		private Dictionary<string, Command> commandObjs = new Dictionary<string, Command> {
-			{"harpunen", new ConstantReply("https://www.youtube.com/watch?v=93Tj2bCslBk")},
-			{"penis", new ConstantReply("https://www.youtube.com/watch?v=1qe2MDdfw1g")},
-			{"dboost", new ConstantReply("http://i.imgur.com/cSAlF1d.jpg")},
-			{"version", new ConstantReply(VERSION)},
-			{"find", new MessageSearch()}
-		};
+		private DiscordClient m_client = new DiscordClient();
+		private Thread m_eventThread;
+		private bool m_hasStartedConnecting = false;
 
 		public DiscordMain() {
 			if (!File.Exists("credentials.txt")) {
 				throw new FileNotFoundException("No 'credentials.txt' found, make sure that it's placed in the same directory as the executable!");
 			}
 
-			using (StreamReader sr = new StreamReader("credentials.txt")) {
-				client.ClientPrivateInformation.email = sr.ReadLine();
-				client.ClientPrivateInformation.password = sr.ReadLine();
-			}
-
-			client.Connected += (sender, e) => {  Console.WriteLine($"Connected! User: {e.user.Username }"); };
-			client.SendLoginRequest();
-			client.MessageReceived += parseMessage;
-			client.Connected += onConnected;
-
-			Thread t = new Thread(client.Connect);
-			t.Start();
+			m_client.Connected += onConnected;
 
 			while (true) {
+				if (m_eventThread == null || (!m_client.WebsocketAlive && !m_hasStartedConnecting)) {
+					connect();
+				}
 				Thread.Sleep(100);
 			}
 		}
 
-		private void onConnected(object a_sender, DiscordConnectEventArgs a_eventArgs) {
-			foreach (var server in client.GetServersList()) {
-				Console.WriteLine("Connected to server " + server.name + " (" + server.id + ")");
-				m_discordServers.Add(new DiscordServerData(server));
-			}
-		}
-
-		private void parseMessage(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			string[] splitCommandMessage = a_eventArgs.message.content.Split(new char[]{' '}, 2);
-			DiscordChannel channel = a_eventArgs.Channel;
-
-			if (splitCommandMessage.Length == 0) {
-				return;
-			}
-			if (!splitCommandMessage[0].StartsWith("!")) {
-				return;
+		private void connect() {
+			m_hasStartedConnecting = true;
+			using (StreamReader sr = new StreamReader("credentials.txt")) {
+				m_client.ClientPrivateInformation.email = sr.ReadLine();
+				m_client.ClientPrivateInformation.password = sr.ReadLine();
 			}
 
-			string command = splitCommandMessage[0].Substring(1);
-			string parameters = splitCommandMessage.Length >= 2
-				? splitCommandMessage[1]
-				: null;
+			m_client.SendLoginRequest();
 
-			switch(command){
-				case "time":
-					handleTimeCommand(parameters, channel);
-					break;
-				case "quote":
-					if (a_eventArgs.message.content.Length >= 7) {
-						handleQuote(a_eventArgs.message.content.Substring(7), a_eventArgs.author, channel);
-					} else {
-						handleQuote("", a_eventArgs.author, channel);
-					}
-					break;
-				case "d2r":
-					if(a_eventArgs.message.content.Length >= 5) {
-						handleDiablo2(a_eventArgs.message.content.Substring(5), channel);
-					} else {
-						handleDiablo2("", channel);
-					}
-					break;
-				case "commands":
-					string commandStrings = commandObjs.Keys.Aggregate(COMMANDS, (x, y) => x + "\n!" + y);
-					client.SendMessageToChannel(commandStrings, channel);
-					break;
-				default:
-					Command foundCommand;
-					if(commandObjs.TryGetValue(command, out foundCommand)) {
-						foundCommand.execute(client, channel, a_eventArgs.author, parameters);
-					} else {
-						client.SendMessageToChannel(splitCommandMessage[0] + " is not a valid command. " + COMMANDS, channel);
-					}
-					break;
-			}
-		}
+			Plugins = new List<DiscordPlugin>();
 
-		private void handleTimeCommand(string a_timeArg1, DiscordChannel a_channel) {
-			client.SendMessageToChannel(TimeFunctions.getTimeForLocation(a_timeArg1), a_channel);
-		}
+			Plugins.Add(new TimePlugin(this));
+			Plugins.Add(new Diablo2Plugin(this));
+			Plugins.Add(new HarpunenPlugin(this));
+			Plugins.Add(new PenisPlugin(this));
+			Plugins.Add(new DamageBoostPlugin(this));
+			Plugins.Add(new CommandsPlugin(this));
+			Plugins.Add(new VersionPlugin(this));
+			Plugins.Add(new QuotePlugin(this));
 
-		private void handleQuote(string a_quoteMessage, DiscordMember a_sender, DiscordChannel a_channel) {
-			if (a_quoteMessage == null || a_quoteMessage.Trim() == "") {
-				client.SendMessageToChannel(QUOTE_USAGE, a_channel);
-				return;
-			}
-
-			DiscordServerData ds = m_discordServers.Find(x => x.Server == a_channel.parent);
-
-			if (ds == null) {
-				return;
-			}
-
-			string command = a_quoteMessage.Split(' ')[0].Trim();
-
-			if (command == "get") {
-				if (a_quoteMessage.Length > 3) {
-					client.SendMessageToChannel(ds.getRandomQuote(a_quoteMessage.Substring(4).Split(' ')[0]), a_channel);
-				} else {
-					client.SendMessageToChannel(ds.getRandomQuote(""), a_channel);
+			for (int i = 0; i < Plugins.Count; ) {
+				if (string.IsNullOrEmpty(Plugins[i].Command)) {
+					Console.WriteLine(string.Format("Plugin \"{0}\" has no command, deleting from active list.", Plugins[i].ToString()));
+					Plugins.RemoveAt(i);
+					continue;
 				}
 
-				return;
-			} else if (command == "add") {
-				if (a_quoteMessage.Length > 3) {
-					client.SendMessageToChannel(ds.addQuote(a_quoteMessage.Substring(4)), a_channel);
-				} else {
-					client.SendMessageToChannel(ds.addQuote(""), a_channel);
-				}
-
-				return;
-			} else if (command == "remove") {
-				if (a_quoteMessage.Length > 6) {
-					client.SendMessageToChannel(ds.removeQuotesForUser(a_quoteMessage.Substring(7).Split(' ')[0]), a_channel);
-				} else {
-					client.SendMessageToChannel(ds.removeQuotesForUser(""), a_channel);
-				}
-
-				return;
-			} else if (command == "clear") {
-				client.SendMessageToChannel(ds.clearQuotes(a_sender), a_channel);
-				return;
-			} else if (command == "count") {
-				client.SendMessageToChannel(ds.getQuoteCount(), a_channel);
-				return;
+				m_client.AudioPacketReceived             += Plugins[i].onAudioPacketReceived;
+				m_client.BanRemoved                      += Plugins[i].onBanRemoved;
+				m_client.ChannelCreated                  += Plugins[i].onChannelCreated;
+				m_client.ChannelDeleted                  += Plugins[i].onChannelDeleted;
+				m_client.ChannelUpdated                  += Plugins[i].onChannelUpdated;
+				m_client.Connected                       += Plugins[i].onConnected;
+				m_client.GuildCreated                    += Plugins[i].onGuildCreated;
+				m_client.GuildDeleted                    += Plugins[i].onGuildDeleted;
+				m_client.GuildMemberBanned               += Plugins[i].onGuildMemberBanned;
+				m_client.GuildMemberUpdated              += Plugins[i].onGuildMemberUpdated;
+				m_client.GuildUpdated                    += Plugins[i].onGuildUpdated;
+				m_client.KeepAliveSent                   += Plugins[i].onKeepAliveSent;
+				m_client.MentionReceived                 += Plugins[i].onMentionReceived;
+				m_client.MessageDeleted                  += Plugins[i].onMessageDeleted;
+				m_client.MessageEdited                   += Plugins[i].onMessageEdited;
+				m_client.MessageReceived                 += Plugins[i].onMessageReceived;
+				m_client.PresenceUpdated                 += Plugins[i].onPresenceUpdated;
+				m_client.PrivateChannelCreated           += Plugins[i].onPrivateChannelCreated;
+				m_client.PrivateChannelDeleted           += Plugins[i].onPrivateChannelDeleted;
+				m_client.PrivateMessageDeleted           += Plugins[i].onPrivateMessageDeleted;
+				m_client.PrivateMessageReceived          += Plugins[i].onPrivateMessageReceived;
+				m_client.RoleDeleted                     += Plugins[i].onRoleDeleted;
+				m_client.RoleUpdated                     += Plugins[i].onRoleUpdated;
+				m_client.SocketClosed                    += Plugins[i].onSocketClosed;
+				m_client.SocketOpened                    += Plugins[i].onSocketOpened;
+				m_client.TextClientDebugMessageReceived  += Plugins[i].onTextClientDebugMessageReceived;
+				m_client.UnknownMessageTypeReceived      += Plugins[i].onUnknownMessageTypeReceived;
+				m_client.URLMessageAutoUpdate            += Plugins[i].onURLMessageAutoUpdate;
+				m_client.UserAddedToServer               += Plugins[i].onUserAddedToServer;
+				m_client.UserLeftVoiceChannel            += Plugins[i].onUserLeftVoiceChannel;
+				m_client.UserRemovedFromServer           += Plugins[i].onUserRemovedFromServer;
+				m_client.UserSpeaking                    += Plugins[i].onUserSpeaking;
+				m_client.UserTypingStart                 += Plugins[i].onUserTypingStart;
+				m_client.UserUpdate                      += Plugins[i].onUserUpdate;
+				m_client.VoiceClientConnected            += Plugins[i].onVoiceClientConnected;
+				m_client.VoiceClientDebugMessageReceived += Plugins[i].onVoiceClientDebugMessageReceived;
+				m_client.VoiceQueueEmpty                 += Plugins[i].onVoiceQueueEmpty;
+				m_client.VoiceStateUpdate                += Plugins[i].onVoiceStateUpdate;
+				++i;
 			}
-			client.SendMessageToChannel(QUOTE_USAGE, a_channel);
+
+			m_eventThread = new Thread(m_client.Connect);
+			m_eventThread.Start();
 		}
 
-		private void handleDiablo2(string a_argString, DiscordChannel a_channel) {
-			if (a_argString.Trim() == "") {
-				client.SendMessageToChannel(D2_USAGE, a_channel);
-				return;
-			}
+		public void onConnected(object a_sender, DiscordConnectEventArgs a_eventArgs) {
+			Console.WriteLine($"Connected! User: { a_eventArgs.user.Username }");
+			m_hasStartedConnecting = false;
+		}
 
-			string[] splitArgument = a_argString.Split(' ');
-			string command = splitArgument[0];
-
-			if (command == "find") {
-				if (splitArgument.Length > 1) {
-					try {
-						client.SendMessageToChannel(DiscordBotDiablo2.Diablo2Plugin.getPossibleWords(splitArgument[1], int.Parse(splitArgument[2])), a_channel);
-					} catch (FormatException) {
-						try {
-							client.SendMessageToChannel(DiscordBotDiablo2.Diablo2Plugin.getPossibleWords(splitArgument[2], int.Parse(splitArgument[1])), a_channel);
-						} catch (FormatException) {
-							string[] runes = new string[splitArgument.Length - 1];
-
-							for (int i = 0; i < runes.Length; ++i) {
-								runes[i] = splitArgument[i + 1];
-							}
-
-							client.SendMessageToChannel(DiscordBotDiablo2.Diablo2Plugin.getMatchingRunewords(runes), a_channel);
-						}
-					}
-				} else {
-					client.SendMessageToChannel(EMSG_D2_NO_ITEM, a_channel);
+		public DiscordPlugin getPluginFromCommand(string a_command) {
+			foreach (var plugin in Plugins) {
+				if (plugin.Command == a_command) {
+					return plugin;
 				}
-				return;
-			} else {
-				client.SendMessageToChannel(DiscordBotDiablo2.Diablo2Plugin.getRuneword(a_argString), a_channel);
-				return;
 			}
+
+			return null;
 		}
 	}
 }
