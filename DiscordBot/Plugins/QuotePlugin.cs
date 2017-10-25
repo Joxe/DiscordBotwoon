@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,7 @@ namespace DiscordBot.Plugins {
 		}
 
 		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			string[] splitString = a_eventArgs.message_text.Split(' ');
-
+			string[] splitString = a_eventArgs.MessageText.Split(' ');
 
 			if (splitString[0] != Command) {
 				return;
@@ -26,14 +26,14 @@ namespace DiscordBot.Plugins {
 				splitString[i] = splitString[i].Trim();
 			}
 
-			DiscordServerData ds = m_discordServers.Find(x => x.Server == a_eventArgs.Channel.parent);
+			DiscordServerData ds = m_discordServers.Find(x => x.Server == a_eventArgs.Channel.Parent);
 
 			if (ds == null) {
-				ds = new DiscordServerData(a_eventArgs.Channel.parent);
+				ds = new DiscordServerData(a_eventArgs.Channel.Parent);
 				m_discordServers.Add(ds);
 			}
 
-			if (a_eventArgs.message_text.Length == Command.Length) {
+			if (a_eventArgs.MessageText.Length == Command.Length) {
 				a_eventArgs.Channel.SendMessage(ds.getRandomQuote(""));
 				return;
 			}
@@ -41,16 +41,16 @@ namespace DiscordBot.Plugins {
 			string subCommand = splitString[1];
 
 			if (subCommand == "get") {
-				a_eventArgs.Channel.SendMessage(ds.getRandomQuote(a_eventArgs.message_text.Substring(Command.Length + subCommand.Length + 1).Trim()));
+				a_eventArgs.Channel.SendMessage(ds.getRandomQuote(a_eventArgs.MessageText.Substring(Command.Length + subCommand.Length + 1).Trim()));
 				return;
 			} else if (subCommand == "add") {
-				a_eventArgs.Channel.SendMessage(ds.addQuote(a_eventArgs.message_text.Substring(Command.Length + subCommand.Length + 1).Trim()));
+				a_eventArgs.Channel.SendMessage(ds.addQuote(a_eventArgs.MessageText.Substring(Command.Length + subCommand.Length + 1).Trim()));
 				return;
 			} else if (subCommand == "remove") {
-				a_eventArgs.Channel.SendMessage(ds.removeQuotesForUser(a_eventArgs.message_text.Substring(Command.Length + subCommand.Length + 1).Trim()));
+				a_eventArgs.Channel.SendMessage(ds.removeQuotesForUser(a_eventArgs.MessageText.Substring(Command.Length + subCommand.Length + 1).Trim()));
 				return;
 			} else if (subCommand == "clear") {
-				a_eventArgs.Channel.SendMessage(ds.clearQuotes(a_eventArgs.author));
+				a_eventArgs.Channel.SendMessage(ds.clearQuotes(a_eventArgs.Author));
 				return;
 			} else if (subCommand == "count") {
 				a_eventArgs.Channel.SendMessage(ds.getQuoteCount());
@@ -59,7 +59,9 @@ namespace DiscordBot.Plugins {
 				a_eventArgs.Channel.SendMessage(QUOTE_USAGE);
 				return;
 			}
-			a_eventArgs.Channel.SendMessage(ds.getRandomQuote(a_eventArgs.message_text.Substring(Command.Length + subCommand.Length + 1).Trim()));
+			a_eventArgs.Channel.SendMessage(ds.getRandomQuote(a_eventArgs.MessageText.Substring(Command.Length + subCommand.Length + 1).Trim()));
 		}
 	}
 }
+
+*/

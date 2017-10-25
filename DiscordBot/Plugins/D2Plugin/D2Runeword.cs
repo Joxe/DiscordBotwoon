@@ -117,7 +117,7 @@ namespace DiscordBot.Plugins.D2Plugin {
 			Runes    = a_runes;
 		}
 
-		public string getRunesAsString() {
+		public string GetRunesAsString() {
 			StringBuilder returnString = new StringBuilder("[");
 
 			for (int i = 0; i < Runes.Length; ++i) {

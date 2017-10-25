@@ -1,17 +1,22 @@
-﻿using DiscordSharp.Events;
+﻿using System;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class HarpunenPlugin : DiscordPlugin {
-		public HarpunenPlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public HarpunenPlugin(DiscordClient a_discordMain) : base(a_discordMain) {
 			Command = "!harpunen";
+			Console.WriteLine("\tHarpunen Plugin Loaded, command: " + Command);
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.message_text.Split(' ')[0].Trim() != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage("https://www.youtube.com/watch?v=93Tj2bCslBk");
+			await e.Message.RespondAsync("https://www.youtube.com/watch?v=93Tj2bCslBk");
+			return;
 		}
 
 		public override string ToString() {

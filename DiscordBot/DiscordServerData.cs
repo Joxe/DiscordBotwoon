@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -28,7 +29,7 @@ namespace DiscordBot {
 		private const string EMSG_QUOTE_NO_MESSAGE = "{0} needs to say something for me to save it, silent quotes are strictly forbidden as per EU law.";
 
 		public DiscordServerData(DiscordServer a_server) {
-			foreach (var channel in a_server.channels) {
+			foreach (var channel in a_server.Channels) {
 				m_channels.Add(channel);
 			}
 			Server = a_server;
@@ -112,7 +113,7 @@ namespace DiscordBot {
 			bool allowedToClear = false;
 
 			foreach (var role in a_member.Roles) {
-				if (role.permissions.HasPermission(DiscordSpecialPermissions.ManageServer)) {
+				if (role.Permissions.HasPermission(DiscordSpecialPermissions.ManageServer)) {
 					allowedToClear = true;
 					break;
 				}
@@ -135,7 +136,7 @@ namespace DiscordBot {
 		private void saveQuotesForServer() {
 			IFormatter formatter = new BinaryFormatter();
 
-			using (Stream stream = new FileStream(Server.id + QUOTE_FILENAME, FileMode.Create, FileAccess.Write, FileShare.None)) {
+			using (Stream stream = new FileStream(Server.ID + QUOTE_FILENAME, FileMode.Create, FileAccess.Write, FileShare.None)) {
 				formatter.Serialize(stream, m_quotes);
 				stream.Close();
 			}
@@ -144,14 +145,15 @@ namespace DiscordBot {
 		private void loadQuotesForServer() {
 			IFormatter formatter = new BinaryFormatter();
 
-			if (!File.Exists(Server.id + QUOTE_FILENAME)) {
+			if (!File.Exists(Server.ID + QUOTE_FILENAME)) {
 				return;
 			}
 
-			using (Stream stream = new FileStream(Server.id + QUOTE_FILENAME, FileMode.Open, FileAccess.Read, FileShare.None)) {
+			using (Stream stream = new FileStream(Server.ID + QUOTE_FILENAME, FileMode.Open, FileAccess.Read, FileShare.None)) {
 				m_quotes = (List<Quote>)formatter.Deserialize(stream);
 				stream.Close();
 			}
 		}
 	}
 }
+*/

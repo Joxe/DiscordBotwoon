@@ -1,6 +1,7 @@
 ﻿using System;
-using DiscordSharp;
-using DiscordSharp.Events;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot {
 	class DiscordPlugin {
@@ -8,158 +9,115 @@ namespace DiscordBot {
 
 		protected DiscordMain m_discordMain;
 
-		public DiscordPlugin(DiscordMain a_discordMain) {
-			m_discordMain = a_discordMain;
+		public DiscordPlugin(DiscordClient a_discordMain) {
+			a_discordMain.MessageCreated += OnMessageCreated;
 		}
 
-		public virtual void onAudioPacketReceived(object a_sender, DiscordAudioPacketEventArgs a_eventArgs) {
-
+		public virtual async Task OnMessageCreated(MessageCreateEventArgs e) {
+			await Task.FromResult(0);
 		}
 
-		public virtual void onBanRemoved(object a_sender, DiscordBanRemovedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onChannelCreated(object a_sender, DiscordChannelCreateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onChannelDeleted(object a_sender, DiscordChannelDeleteEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onChannelUpdated(object a_sender, DiscordChannelUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onConnected(object a_sender, DiscordConnectEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onGuildCreated(object a_sender, DiscordGuildCreateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onGuildDeleted(object a_sender, DiscordGuildDeleteEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onGuildMemberBanned(object a_sender, DiscordGuildBanEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onGuildMemberUpdated(object a_sender, DiscordGuildMemberUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onGuildUpdated(object a_sender, DiscordServerUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onKeepAliveSent(object a_sender, DiscordKeepAliveSentEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onMentionReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onMessageDeleted(object a_sender, DiscordMessageDeletedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onMessageEdited(object a_sender, DiscordMessageEditedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onPresenceUpdated(object a_sender, DiscordPresenceUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onPrivateChannelCreated(object a_sender, DiscordPrivateChannelEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onPrivateChannelDeleted(object a_sender, DiscordPrivateChannelDeleteEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onPrivateMessageDeleted(object a_sender, DiscordPrivateMessageDeletedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onPrivateMessageReceived(object a_sender, DiscordPrivateMessageEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onRoleDeleted(object a_sender, DiscordGuildRoleDeleteEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onRoleUpdated(object a_sender, DiscordGuildRoleUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onSocketClosed(object a_sender, DiscordSocketClosedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onSocketOpened(object a_sender, EventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onTextClientDebugMessageReceived(object a_sender, LoggerMessageReceivedArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onUnknownMessageTypeReceived(object a_sender, UnknownMessageEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onURLMessageAutoUpdate(object a_sender, DiscordURLUpdateEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onUserAddedToServer(object a_sender, DiscordGuildMemberAddEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onUserLeftVoiceChannel(object a_sender, DiscordLeftVoiceChannelEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onUserRemovedFromServer(object a_sender, DiscordGuildMemberRemovedEventArgs a_eventArgs) {
-		
-		}
-		
-		public virtual void onUserSpeaking(object a_sender, DiscordVoiceUserSpeakingEventArgs a_eventArgs) {
-		
-		}
-		public virtual void onUserTypingStart(object a_sender, DiscordTypingStartEventArgs a_eventArgs) {
+		public virtual void OnAudioPacketReceived(object a_sender, DiscordAudioPacketEventArgs a_eventArgs) {
 
 		}
 
-		public virtual void onUserUpdate(object a_sender, DiscordUserUpdateEventArgs a_eventArgs) {
+		public virtual void OnChannelCreated(object a_sender, ChannelCreateEventArgs a_eventArgs) {
 		
 		}
 		
-		public virtual void onVoiceClientConnected(object a_sender, EventArgs a_eventArgs) {
+		public virtual void OnChannelDeleted(object a_sender, ChannelDeleteEventArgs a_eventArgs) {
 		
 		}
 		
-		public virtual void onVoiceClientDebugMessageReceived(object a_sender, LoggerMessageReceivedArgs a_eventArgs) {
+		public virtual void OnChannelUpdated(object a_sender, ChannelUpdateEventArgs a_eventArgs) {
 		
 		}
 		
-		public virtual void onVoiceQueueEmpty(object a_sender, EventArgs a_eventArgs) {
+		public virtual void OnGuildCreated(object a_sender, GuildCreateEventArgs a_eventArgs) {
 		
 		}
 		
-		public virtual void onVoiceStateUpdate(object a_sender, DiscordVoiceStateUpdateEventArgs a_eventArgs) {
+		public virtual void OnGuildDeleted(object a_sender, GuildDeleteEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnGuildMemberBanned(object a_sender, GuildBanAddEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnGuildMemberUnbanned(object a_sender, GuildBanRemoveEventArgs a_eventArgs) {
+
+		}
+
+		public virtual void OnGuildMemberUpdated(object a_sender, GuildMemberUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnGuildUpdated(object a_sender, GuildUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnMentionReceived(object a_sender, MentionType a_eventArgs) {
+		
+		}
+		
+		public virtual void OnMessageDeleted(object a_sender, MessageDeleteEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnMessageEdited(object a_sender, MessageUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnMessageReceived(object a_sender, MessageCreateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnPresenceUpdated(object a_sender, PresenceUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnRoleDeleted(object a_sender, GuildRoleDeleteEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnRoleUpdated(object a_sender, GuildRoleUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnUserAddedToServer(object a_sender, GuildMemberAddEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnUserLeftVoiceChannel(object a_sender, VoiceServerUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnUserRemovedFromServer(object a_sender, GuildMemberRemoveEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnUserSpeaking(object a_sender, VoiceReceiveEventArgs a_eventArgs) {
+		
+		}
+
+		public virtual void OnUserTypingStart(object a_sender, TypingStartEventArgs a_eventArgs) {
+
+		}
+
+		public virtual void OnUserUpdate(object a_sender, UserUpdateEventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnVoiceClientConnected(object a_sender, EventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnVoiceQueueEmpty(object a_sender, EventArgs a_eventArgs) {
+		
+		}
+		
+		public virtual void OnVoiceStateUpdate(object a_sender, VoiceStateUpdateEventArgs a_eventArgs) {
 		
 		}
 	}

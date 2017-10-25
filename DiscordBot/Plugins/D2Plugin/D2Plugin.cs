@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using DiscordBot;
-using DiscordSharp.Events;
+using System.Threading.Tasks;
+using DSharpPlus.EventArgs;
+using DSharpPlus;
 
 namespace DiscordBot.Plugins.D2Plugin {
 	class Diablo2Plugin : DiscordPlugin {
@@ -14,12 +15,13 @@ namespace DiscordBot.Plugins.D2Plugin {
 		private const string EMSG_D2_CANT_FIND_SOCKETS = "I can't understand how many sockets the item you specified has!";
 		private const string EMSG_D2_NO_ITEM = "You have no specified an item to look for!";
 
-		public Diablo2Plugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public Diablo2Plugin(DiscordClient a_discordMain) : base(a_discordMain) {
 			Command = "!d2r";
+			Console.WriteLine("\tDiablo 2 Runewords Plugin Loaded, command: " + Command);
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			string[] splitString = a_eventArgs.message_text.Split(' ');
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			string[] splitString = e.Message.Content.Split(' ');
 
 			if (splitString[0] != Command) {
 				return;
@@ -29,18 +31,18 @@ namespace DiscordBot.Plugins.D2Plugin {
 				splitString[i] = splitString[i].Trim();
 			}
 
-			if (a_eventArgs.message_text.Length == Command.Length) {
-				a_eventArgs.Channel.SendMessage(D2_USAGE);
+			if (e.Message.Content.Length == Command.Length) {
+				await e.Message.RespondAsync(D2_USAGE);
 				return;
 			}
 
 			if (splitString[1] == "find") {
 				if (splitString.Length > 2) {
 					try {
-						a_eventArgs.Channel.SendMessage(getPossibleWords(splitString[2], int.Parse(splitString[3])));
+						await e.Message.RespondAsync(GetPossibleRunwords(splitString[2], int.Parse(splitString[3])));
 					} catch (FormatException) {
 						try {
-							a_eventArgs.Channel.SendMessage(getPossibleWords(splitString[3], int.Parse(splitString[2])));
+							await e.Message.RespondAsync(GetPossibleRunwords(splitString[3], int.Parse(splitString[2])));
 						} catch (FormatException) {
 							string[] runes = new string[splitString.Length - 2];
 
@@ -48,15 +50,15 @@ namespace DiscordBot.Plugins.D2Plugin {
 								runes[i] = splitString[i + 2];
 							}
 
-							a_eventArgs.Channel.SendMessage(getMatchingRunewords(runes));
+							await e.Message.RespondAsync(GetMatchinRunewords(runes));
 						}
 					}
 				} else {
-					a_eventArgs.Channel.SendMessage(EMSG_D2_NO_ITEM);
+					await e.Message.RespondAsync(EMSG_D2_NO_ITEM);
 				}
 				return;
 			} else {
-				a_eventArgs.Channel.SendMessage(getRuneword(splitString[1]));
+				await e.Message.RespondAsync(GetRuneword(splitString[1]));
 				return;
 			}
 		}
@@ -65,7 +67,7 @@ namespace DiscordBot.Plugins.D2Plugin {
 			return "Diablo 2 Plugin";
 		}
 
-		public static string getRuneword(string a_runeword) {
+		public static string GetRuneword(string a_runeword) {
 			foreach (var runeword in Runeword.RUNEWORDS) {
 				if (runeword.Name.ToLower() == a_runeword.ToLower()) {
 					return runeword.ToString();
@@ -74,7 +76,7 @@ namespace DiscordBot.Plugins.D2Plugin {
 			return string.Format(NO_RUNEWORD, a_runeword);
 		}
 
-		public static string getPossibleWords(string a_itemType, int a_sockets) {
+		public static string GetPossibleRunwords(string a_itemType, int a_sockets) {
 			List<Runeword> possibleWords = new List<Runeword>();
 
 			foreach (var runeword in Runeword.RUNEWORDS) {
@@ -102,13 +104,13 @@ namespace DiscordBot.Plugins.D2Plugin {
 			foreach (var runeword in possibleWords) {
 				returnString.Append(runeword.Name);
 				returnString.Append(" - ");
-				returnString.AppendLine(runeword.getRunesAsString());
+				returnString.AppendLine(runeword.GetRunesAsString());
 			}
 
 			return returnString.ToString();
 		}
 
-		public static string getMatchingRunewords(string[] a_runes) {
+		public static string GetMatchinRunewords(string[] a_runes) {
 			List<Runeword> validRunewords = new List<Runeword>();
 
 			foreach (var runeword in Runeword.RUNEWORDS) {

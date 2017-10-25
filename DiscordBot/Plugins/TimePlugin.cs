@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
-using DiscordBot;
-using DiscordSharp.Events;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class TimePlugin : DiscordPlugin {
@@ -28,45 +29,46 @@ namespace DiscordBot.Plugins {
 			"usw", "valve"
 		};
 
-		public TimePlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public TimePlugin(DiscordClient a_discordMain) : base(a_discordMain) {
 			Command = "!time";
+			Console.WriteLine("\tTime Plugin Loaded, command: " + Command);
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.message_text.Split(' ')[0] != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0] != Command) {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage(getTimeForLocation(a_eventArgs.message_text.Substring(Command.Length).Trim()));
+			await e.Message.RespondAsync(GetTimeForLocation(e.Message.Content.Substring(Command.Length).Trim()));
 		}
 
 		public override string ToString() {
 			return "Time Plugin";
 		}
 
-		public string getTimeForLocation(string a_location) {
+		public string GetTimeForLocation(string a_location) {
 			if (string.IsNullOrWhiteSpace(a_location)) {
 				return string.Format(TIME_MY_TIME, DateTime.Now.ToString()) + "\n" + TIME_USAGE;
 			}
 			a_location = a_location.ToLower();
 			if (AUS_MATCHES.Contains(a_location)) {
-				return formatTimeDiff(TIME_AUS, AUS_TIME_DIFF);
+				return FormatTimeDiff(TIME_AUS, AUS_TIME_DIFF);
 			}
 			if (JAP_MATCHES.Contains(a_location)) {
-				return formatTimeDiff(TIME_JAP, JAP_TIME_DIFF);
+				return FormatTimeDiff(TIME_JAP, JAP_TIME_DIFF);
 			}
 			if (USW_MATCHES.Contains(a_location)) {
-				return formatTimeDiff(TIME_USW, USW_TIME_DIFF);
+				return FormatTimeDiff(TIME_USW, USW_TIME_DIFF);
 			}
 
 			return TIME_USAGE;
 		}
 
-		public string formatTimeDiff(string str, int timeDiff) {
-			return formatTime(str, DateTime.Now.AddHours(timeDiff));
+		public string FormatTimeDiff(string str, int timeDiff) {
+			return FormatTime(str, DateTime.Now.AddHours(timeDiff));
 		}
 
-		public string formatTime(string str, DateTime time) {
+		public string FormatTime(string str, DateTime time) {
 			return string.Format(str, time.Hour.ToString().PadLeft(2, '0'), time.Minute.ToString().PadLeft(2, '0'));
 		}
 	}

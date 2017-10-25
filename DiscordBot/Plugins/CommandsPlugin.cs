@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿/*
+using System.Text;
 using DiscordSharp.Events;
 
 namespace DiscordBot.Plugins {
@@ -10,7 +11,7 @@ namespace DiscordBot.Plugins {
 		}
 
 		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.message_text.Split(' ')[0].Trim() != Command) {
+			if (a_eventArgs.MessageText.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
@@ -30,3 +31,4 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
+*/
