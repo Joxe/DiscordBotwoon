@@ -1,4 +1,5 @@
-﻿using DiscordSharp;
+﻿/*
+using DiscordSharp;
 using DiscordSharp.Events;
 using DiscordSharp.Objects;
 using System.Linq;
@@ -59,3 +60,4 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
+*/

@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -11,7 +12,6 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace DiscordBot {
-	/*
 	class DiscordMain {
 		public List<DiscordPlugin> Plugins { get; private set; }
 

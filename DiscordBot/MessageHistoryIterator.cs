@@ -1,4 +1,5 @@
-﻿using DiscordSharp;
+﻿/*
+using DiscordSharp;
 using DiscordSharp.Objects;
 using System;
 using System.Collections.Generic;
@@ -84,4 +85,4 @@ namespace DiscordBot {
 		}
 	}
 }
-
+*/

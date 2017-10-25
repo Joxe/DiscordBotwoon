@@ -52,16 +52,8 @@ namespace DiscordBot {
 			Console.WriteLine("CurrentApplication: " + m_discordClient.CurrentApplication);
 			Console.WriteLine("CurrentUser: " + m_discordClient.CurrentUser);
 			Console.WriteLine("Gateway URL: " + m_discordClient.GatewayUrl);
-			Console.WriteLine("Gateway Version: " + m_discordClient.GatewayVersion);
 			Console.WriteLine("Connected? DSharpPlus version " + m_discordClient.VersionString);
 			
-			m_discordClient.MessageCreated += async e => {
-				Console.WriteLine("Message received");
-				if (e.Message.Author.Username != "Botwoon") {
-					await e.Message.RespondAsync("Message received");
-				}
-			};
-
 			await Task.Delay(-1);
 		}
 	}
