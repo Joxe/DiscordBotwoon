@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DiscordBot.Plugins;
 using DiscordBot.Plugins.D2Plugin;
 using DSharpPlus;
+using DSharpPlus.Net.WebSocket;
 
 namespace DiscordBot {
 	class DiscordMain {
@@ -13,16 +14,6 @@ namespace DiscordBot {
 
 		static void Main(string[] args) {
 			MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
-			/*
-			try {
-				DiscordMain dm = new DiscordMain();
-			} catch (FileNotFoundException fnfe) {
-				Console.WriteLine(fnfe.Message);
-
-				Console.WriteLine("Press any key to exit.");
-				Console.ReadKey();
-			}
-			*/
 		}
 
 		static async Task MainAsync(string[] a_args) {
@@ -31,6 +22,8 @@ namespace DiscordBot {
 					Token = "MTg0MjgyODQ4NzcxOTY0OTI4.DNIJ2w.FuXpro3-55bZNMD9hU3utpFrRto",
 					TokenType = TokenType.Bot 
 				});
+
+			m_discordClient.SetWebSocketClient<WebSocketSharpClient>();
 
 			Console.WriteLine("Loading Plugins");
 
@@ -53,7 +46,7 @@ namespace DiscordBot {
 			Console.WriteLine("CurrentUser: " + m_discordClient.CurrentUser);
 			Console.WriteLine("Gateway URL: " + m_discordClient.GatewayUrl);
 			Console.WriteLine("Connected? DSharpPlus version " + m_discordClient.VersionString);
-			
+
 			await Task.Delay(-1);
 		}
 	}
