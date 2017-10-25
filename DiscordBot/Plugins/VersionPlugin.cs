@@ -1,20 +1,21 @@
-﻿/*
-using DiscordSharp.Events;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class VersionPlugin : DiscordPlugin {
-		private const string VERSION = "Hello I'm Botwoon in a very early version (25th of March 2016), please no Super Missiles.";
+		private const string VERSION = "Hello I'm Botwoon in a very early version (25th of October 2017), please no Super Missiles.";
 
-		public VersionPlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public VersionPlugin(DiscordClient a_discordClient) : base(a_discordClient) {
 			Command = "!version";
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.MessageText.Split(' ')[0].Trim() != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage(VERSION);
+			await e.Message.RespondAsync(VERSION);
 		}
 
 		public override string ToString() {
@@ -22,4 +23,3 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
-*/

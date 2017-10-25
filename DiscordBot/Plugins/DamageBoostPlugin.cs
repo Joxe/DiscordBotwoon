@@ -1,18 +1,19 @@
-﻿/*
-using DiscordSharp.Events;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class DamageBoostPlugin : DiscordPlugin {
-		public DamageBoostPlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public DamageBoostPlugin(DiscordClient a_discordClient) : base(a_discordClient) {
 			Command = "!dboost";
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.MessageText.Split(' ')[0].Trim() != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage("http://i.imgur.com/cSAlF1d.jpg");
+			await e.Message.RespondAsync("http://i.imgur.com/cSAlF1d.jpg");
 		}
 
 		public override string ToString() {
@@ -20,4 +21,3 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
-*/

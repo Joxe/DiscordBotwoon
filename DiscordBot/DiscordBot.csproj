@@ -97,7 +97,6 @@
     <Compile Include="Plugins\CommandsPlugin.cs" />
     <Compile Include="Plugins\D2Plugin\D2Runeword.cs" />
     <Compile Include="Plugins\D2Plugin\D2Plugin.cs" />
-    <Compile Include="DiscordMain.cs" />
     <Compile Include="DiscordServerData.cs" />
     <Compile Include="DiscordPlugin.cs" />
     <Compile Include="Plugins\DamageBoostPlugin.cs" />

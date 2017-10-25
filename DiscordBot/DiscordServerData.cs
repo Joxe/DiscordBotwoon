@@ -1,16 +1,15 @@
-﻿/*
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using DiscordSharp.Objects;
+using DSharpPlus;
+using DSharpPlus.Entities;
 
 namespace DiscordBot {
 	class DiscordServerData {
-		public DiscordServer Server { get; private set; }
+		public DiscordGuild Guild { get; private set; }
 
-		private List<DiscordChannel> m_channels = new List<DiscordChannel>();
 		private List<Quote> m_quotes = new List<Quote>();
 		private List<RemindEvent> m_remindEvents = new List<RemindEvent>();
 
@@ -28,16 +27,13 @@ namespace DiscordBot {
 		private const string EMSG_ADD_FAILED_NO_AUTHOR = "Could not add a quote from user as none was defined!";
 		private const string EMSG_QUOTE_NO_MESSAGE = "{0} needs to say something for me to save it, silent quotes are strictly forbidden as per EU law.";
 
-		public DiscordServerData(DiscordServer a_server) {
-			foreach (var channel in a_server.Channels) {
-				m_channels.Add(channel);
-			}
-			Server = a_server;
+		public DiscordServerData(DiscordGuild a_guild) {
+			Guild = a_guild;
 
-			loadQuotesForServer();
+			LoadQuotesForServer();
 		}
 
-		public string addQuote(string a_message) {
+		public string AddQuote(string a_message) {
 			if (string.IsNullOrEmpty(a_message)) {
 				return EMSG_ADD_QUOTE_NO_MSG;
 			}
@@ -63,11 +59,11 @@ namespace DiscordBot {
 			}
 
 			m_quotes.Add(q);
-			saveQuotesForServer();
+			SaveQuotesForServer();
 			return string.Format(ADD_QUOTE_SUCCESS, author);
 		}
 
-		public string getRandomQuote(string a_author = null) {
+		public string GetRandomQuote(string a_author = null) {
 			Random r = new Random();
 			if (string.IsNullOrEmpty(a_author)) {
 				if (m_quotes.Count == 0) {
@@ -91,7 +87,7 @@ namespace DiscordBot {
 			return authorQuotes[r.Next(0, authorQuotes.Count - 1)].ToString();
 		}
 
-		public string removeQuotesForUser(string a_author) {
+		public string RemoveQuotesForUser(string a_author) {
 			if (a_author == null || a_author == "") {
 				return EMSG_REMOVE_FAILED_NO_AUTHOR;
 			}
@@ -109,11 +105,11 @@ namespace DiscordBot {
 			return string.Format(REMOVED_QUOTES, quotesRemoved);
 		}
 
-		public string clearQuotes(DiscordMember a_member) {
+		public string ClearQuotes(DiscordMember a_member) {
 			bool allowedToClear = false;
 
 			foreach (var role in a_member.Roles) {
-				if (role.Permissions.HasPermission(DiscordSpecialPermissions.ManageServer)) {
+				if (role.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed) {
 					allowedToClear = true;
 					break;
 				}
@@ -122,38 +118,37 @@ namespace DiscordBot {
 			if (allowedToClear) {
 				int quotesRemoved = m_quotes.Count;
 				m_quotes.Clear();
-				saveQuotesForServer();
+				SaveQuotesForServer();
 				return string.Format(CLEARED_QUOTES, a_member.Username, quotesRemoved);
 			} else {
 				return string.Format(FAIELD_CLEARED_QUOTES, a_member.Username);
 			}
 		}
 
-		public string getQuoteCount() {
+		public string GetQuoteCount() {
 			return string.Format(QUOTE_COUNT, m_quotes.Count);
 		}
 
-		private void saveQuotesForServer() {
+		private void SaveQuotesForServer() {
 			IFormatter formatter = new BinaryFormatter();
 
-			using (Stream stream = new FileStream(Server.ID + QUOTE_FILENAME, FileMode.Create, FileAccess.Write, FileShare.None)) {
+			using (Stream stream = new FileStream(Guild.Id + QUOTE_FILENAME, FileMode.Create, FileAccess.Write, FileShare.None)) {
 				formatter.Serialize(stream, m_quotes);
 				stream.Close();
 			}
 		}
 
-		private void loadQuotesForServer() {
+		private void LoadQuotesForServer() {
 			IFormatter formatter = new BinaryFormatter();
 
-			if (!File.Exists(Server.ID + QUOTE_FILENAME)) {
+			if (!File.Exists(Guild.Id + QUOTE_FILENAME)) {
 				return;
 			}
 
-			using (Stream stream = new FileStream(Server.ID + QUOTE_FILENAME, FileMode.Open, FileAccess.Read, FileShare.None)) {
+			using (Stream stream = new FileStream(Guild.Id + QUOTE_FILENAME, FileMode.Open, FileAccess.Read, FileShare.None)) {
 				m_quotes = (List<Quote>)formatter.Deserialize(stream);
 				stream.Close();
 			}
 		}
 	}
 }
-*/

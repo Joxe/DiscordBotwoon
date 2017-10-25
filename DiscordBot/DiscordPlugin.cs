@@ -7,10 +7,11 @@ namespace DiscordBot {
 	class DiscordPlugin {
 		public string Command { get; protected set; }
 
-		protected DiscordMain m_discordMain;
+		protected DiscordClient m_discordClient;
 
-		public DiscordPlugin(DiscordClient a_discordMain) {
-			a_discordMain.MessageCreated += OnMessageCreated;
+		public DiscordPlugin(DiscordClient a_discordClient) {
+			m_discordClient = a_discordClient;
+			a_discordClient.MessageCreated += OnMessageCreated;
 		}
 
 		public virtual async Task OnMessageCreated(MessageCreateEventArgs e) {

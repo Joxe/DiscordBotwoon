@@ -1,17 +1,18 @@
-﻿/*
-using System.Text;
-using DiscordSharp.Events;
+﻿using System.Text;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class CommandsPlugin : DiscordPlugin {
 		private const string COMMANDS = "Available Commands";
 
-		public CommandsPlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public CommandsPlugin(DiscordClient a_discordClient) : base(a_discordClient) {
 			Command = "!commands";
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.MessageText.Split(' ')[0].Trim() != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
@@ -19,11 +20,11 @@ namespace DiscordBot.Plugins {
 
 			commands.AppendLine(COMMANDS);
 
-			foreach (var plugin in m_discordMain.Plugins) {
+			foreach (var plugin in DiscordMain.Plugins) {
 				commands.AppendLine(plugin.Command);
 			}
 
-			a_eventArgs.Channel.SendMessage(commands.ToString());
+			await e.Message.RespondAsync(commands.ToString());
 		}
 
 		public override string ToString() {
@@ -31,4 +32,3 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
-*/

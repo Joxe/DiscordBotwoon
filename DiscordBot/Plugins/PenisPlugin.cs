@@ -1,18 +1,19 @@
-﻿/*
-using DiscordSharp.Events;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 
 namespace DiscordBot.Plugins {
 	class PenisPlugin : DiscordPlugin {
-		public PenisPlugin(DiscordMain a_discordMain) : base(a_discordMain) {
+		public PenisPlugin(DiscordClient a_discordMain) : base(a_discordMain) {
 			Command = "!penis";
 		}
 
-		public override void onMessageReceived(object a_sender, DiscordMessageEventArgs a_eventArgs) {
-			if (a_eventArgs.MessageText.Split(' ')[0].Trim() != Command) {
+		public override async Task OnMessageCreated(MessageCreateEventArgs e) {
+			if (e.Message.Content.Split(' ')[0].Trim() != Command) {
 				return;
 			}
 
-			a_eventArgs.Channel.SendMessage("https://www.youtube.com/watch?v=1qe2MDdfw1g");
+			await e.Message.RespondAsync("https://www.youtube.com/watch?v=1qe2MDdfw1g");
 		}
 
 		public override string ToString() {
@@ -20,4 +21,3 @@ namespace DiscordBot.Plugins {
 		}
 	}
 }
-*/

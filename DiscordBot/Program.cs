@@ -19,7 +19,11 @@ namespace DiscordBot {
 		static async Task MainAsync(string[] a_args) {
 			m_discordClient = new DiscordClient(
 				new DiscordConfiguration {
+					#if false
 					Token = "MTg0MjgyODQ4NzcxOTY0OTI4.DNIJ2w.FuXpro3-55bZNMD9hU3utpFrRto",
+					#else
+					Token = "MzcyNzU5MjcxMDEzNjEzNTY4.DNI2pQ.yuP1ZS2tdcnMD0XdyG_MecVtRH0",
+					#endif
 					TokenType = TokenType.Bot 
 				});
 
@@ -30,12 +34,12 @@ namespace DiscordBot {
 			Plugins = new List<DiscordPlugin> {
 				new TimePlugin(m_discordClient),
 				new Diablo2Plugin(m_discordClient),
-				new HarpunenPlugin(m_discordClient)/*,
-				new PenisPlugin(this),
-				new DamageBoostPlugin(this),
-				new CommandsPlugin(this),
-				new VersionPlugin(this),
-				new QuotePlugin(this)*/
+				new HarpunenPlugin(m_discordClient),
+				new PenisPlugin(m_discordClient),
+				new DamageBoostPlugin(m_discordClient),
+				new CommandsPlugin(m_discordClient),
+				new VersionPlugin(m_discordClient),
+				new QuotePlugin(m_discordClient)
 			};
 
 			Console.WriteLine("Connecting...");
