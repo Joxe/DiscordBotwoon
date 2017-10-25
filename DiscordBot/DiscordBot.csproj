@@ -106,6 +106,8 @@
     <Compile Include="Quote.cs" />
     <Compile Include="RemindEvent.cs" />
     <Compile Include="Plugins\TimePlugin.cs" />
+    <Compile Include="Plugins\MessageFindPlugin.cs" />
+    <Compile Include="MessageHistoryIterator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading;
 using DSharpPlus;
@@ -19,6 +20,13 @@ namespace DiscordBot {
 		//private DiscordClient m_client = new DiscordClient();
 		private Thread m_eventThread;
 		private bool m_hasStartedConnecting = false;
+
+		//Is this ok? I really need it in my plugin, man
+		public DiscordClient Client {
+			get {
+				return m_client;
+			}
+		}
 
 		public DiscordMain() {
 			m_discordClient = new DiscordClient(
@@ -96,16 +104,17 @@ namespace DiscordBot {
 			Console.WriteLine($"Connected! User: { a_eventArgs.User.Username }");
 			m_hasStartedConnecting = false;
 
-			Plugins = new List<DiscordPlugin>();
-
-			Plugins.Add(new TimePlugin(this));
-			Plugins.Add(new Diablo2Plugin(this));
-			Plugins.Add(new HarpunenPlugin(this));
-			Plugins.Add(new PenisPlugin(this));
-			Plugins.Add(new DamageBoostPlugin(this));
-			Plugins.Add(new CommandsPlugin(this));
-			Plugins.Add(new VersionPlugin(this));
-			Plugins.Add(new QuotePlugin(this));
+			Plugins = new List<DiscordPlugin> {
+				new TimePlugin(this),
+				new Diablo2Plugin(this),
+				new HarpunenPlugin(this),
+				new PenisPlugin(this),
+				new DamageBoostPlugin(this),
+				new CommandsPlugin(this),
+				new VersionPlugin(this),
+				new QuotePlugin(this),
+				new MessageFindPlugin(this)
+			};
 
 			for (int i = 0; i < Plugins.Count;) {
 				if (string.IsNullOrEmpty(Plugins[i].Command)) {
@@ -159,13 +168,7 @@ namespace DiscordBot {
 		}
 
 		public DiscordPlugin getPluginFromCommand(string a_command) {
-			foreach (var plugin in Plugins) {
-				if (plugin.Command == a_command) {
-					return plugin;
-				}
-			}
-
-			return null;
+			return Plugins.SingleOrDefault(x => string.Compare(x.Command, a_command, true) == 0);
 		}
 
 		public void OnAudioPacketReceived(object a_sender, DiscordAudioPacketEventArgs a_args) {
@@ -320,5 +323,5 @@ namespace DiscordBot {
 			Console.WriteLine(new StackTrace().GetFrame(0).GetMethod());
 		}
 	}
-	*/
 }
+*/
